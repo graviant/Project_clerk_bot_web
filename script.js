@@ -47,9 +47,10 @@ document.getElementById('registrationForm').addEventListener('submit', function(
     
     const taskDate = document.getElementById('taskDate').value;
     const deadline = document.getElementById('deadline').value;
-    const email = document.getElementById('email').value;
-    const phone = document.getElementById('phone').value;
-    const message = document.getElementById('message').value;
+    const projectName = document.getElementById('projectName').value;
+    const customer = document.getElementById('customer').value;
+    const authorTz = document.getElementById('authorTz').value;
+    const cardCount = document.getElementById('cardCount').value;
     
     // Validate deadline
     if (!isValidDate(deadline)) {
@@ -58,13 +59,14 @@ document.getElementById('registrationForm').addEventListener('submit', function(
     }
     
     // Простая базовая валидация
-    if (deadline && email && phone) {
+    if (deadline && projectName && customer && authorTz && cardCount) {
         alert('Форма успешно отправлена!\n\n' + 
               `Дата задания: ${taskDate}\n` +
               `Срок сдачи: ${deadline}\n` +
-              `Email: ${email}\n` +
-              `Телефон: ${phone}\n` +
-              `Сообщение: ${message}`);
+              `Название проекта: ${projectName}\n` +
+              `Заказчик: ${customer}\n` +
+              `Автор ТЗ: ${authorTz}\n` +
+              `Количество карточек: ${cardCount}`);
         
         // Очистка формы после отправки
         this.reset();
