@@ -1,49 +1,96 @@
+<!doctype html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Регистрационная форма задания</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Регистрационная форма задания</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <!-- SDK (рекомендуется, чтобы объект Telegram.WebApp был гарантированно доступен) -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    <div class="container">
-        <form id="registrationForm" class="form">
-            <h2>Регистрация задания</h2>
-            
-            <div class="form-group">
-                <label for="taskDate">Дата задания</label>
-                <input type="text" id="taskDate" name="taskDate" readonly>
-            </div>
-            
-            <div class="form-group">
-                <label for="deadline">Срок сдачи</label>
-                <input type="text" id="deadline" name="deadline" required placeholder="ДД.ММ.ГГГГ">
-            </div>
-            
-            <div class="form-group">
-                <label for="nameProject">Название проекта</label>
-                <input type="text" id="nameProject" name="nameProject" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="customer">Заказчик</label>
-                <input type="text" id="customer" name="customer" required>
-            </div>
+  <div class="container">
+    <form id="registrationForm" class="form">
+      <h2>Регистрация задания</h2>
 
-            <div class="form-group">
-                <label for="authorTask">Автор ТЗ</label>
-                <input type="text" id="authorTask" name="authorTask" required>
-            </div>
+      <div class="form-group">
+        <label for="taskDate">Дата задания</label>
+        <input type="text" id="taskDate" name="taskDate" readonly>
+      </div>
 
-            <div class="form-group">
-                <label for="quantityCards">Количество карточек</label>
-                <input type="text" id="quantityCards" name="quantityCards" required>
-            </div>
-            
-            <button type="submit" class="submit-btn">Отправить</button>
-        </form>
-    </div>
+      <div class="form-group">
+        <label for="deadline">Срок сдачи</label>
+        <input type="text" id="deadline" name="deadline" required placeholder="ДД.ММ.ГГГГ">
+      </div>
 
-    <script src="script.js"></script>
+      <div class="form-group">
+        <label for="nameProject">Название проекта</label>
+        <input type="text" id="nameProject" name="nameProject" required>
+      </div>
+
+      <div class="form-group">
+        <label for="customer">Заказчик</label>
+        <input type="text" id="customer" name="customer" required>
+      </div>
+
+      <div class="form-group">
+        <label for="authorTask">Автор ТЗ</label>
+        <input type="text" id="authorTask" name="authorTask" required>
+      </div>
+
+      <div class="form-group">
+        <label for="quantityCards">Количество карточек</label>
+        <input type="text" id="quantityCards" name="quantityCards" required>
+      </div>
+
+      <button type="submit" class="submit-btn">Отправить</button>
+    </form>
+  </div>
+
+  <!-- Мини-JS прямо в HTML -->
+  <script>
+    // Берём API WebApp
+    const tg = window.Telegram ? window.Telegram.WebApp : null;
+    tg && tg.ready();
+    tg && tg.expand && tg.expand();
+
+    // Проставим сегодняшнюю дату в "Дата задания"
+    document.addEventListener('DOMContentLoaded', () => {
+      const d = new Date();
+      const dd = String(d.getDate()).padStart(2,'0');
+      const mm = String(d.getMonth()+1).padStart(2,'0');
+      const yyyy = d.getFullYear();
+      const taskDate = document.getElementById('taskDate');
+      if (taskDate && !taskDate.value) taskDate.value = `${dd}.${mm}.${yyyy}`;
+    });
+
+    // Собираем данные из формы и шлём их боту
+    function collectPayload() {
+      return {
+        // Маппинг под КЛЮЧИ, которые ты ждёшь в aiogram
+        task_date:      document.getElementById('taskDate')?.value || null,
+        deadline_date:  document.getElementById('deadline')?.value || null,
+        name_project:   document.getElementById('nameProject')?.value || null,
+        customer:       document.getElementById('customer')?.value || null,
+        task_author:    document.getElementById('authorTask')?.value || null,
+        task_volum:     Number(document.getElementById('quantityCards')?.value || 0)
+      };
+    }
+
+    // Перехватываем submit, чтобы страница не перезагружалась
+    const form = document.getElementById('registrationForm');
+    form?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const payload = collectPayload();
+      // на время отладки можно раскомментировать:
+      // console.log('sending:', payload);
+      try {
+        tg && tg.sendData(JSON.stringify(payload)); // <- отправка в бота, который открыл WebApp
+        // tg && tg.close(); // опционально закрыть окно после отправки
+      } catch (err) {
+        alert('Не удалось отправить данные в бота: ' + (err?.message || err));
+      }
+    });
+  </script>
 </body>
 </html>
